@@ -34,13 +34,14 @@ import java.util.Locale;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback,GoogleMap.OnPolygonClickListener, GoogleMap.OnMarkerClickListener, GoogleMap.OnMarkerDragListener {
 
-private GoogleMap mMap;
+    private GoogleMap mMap;
     private Marker homeMarker;
     Polygon shape;
     private static final int REQUEST_CODE = 1;
     private static final int POLYGON_SIDES = 4;
     String[] strTitles =   {"A","B","C","D"};
     List<Marker> markers = new ArrayList();
+    Location userlocation;
     LocationManager locationManager;
     LocationListener locationListener;
     @Override
@@ -73,6 +74,7 @@ private GoogleMap mMap;
         locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
+                userlocation = location;
                 setHomeMarker(location);
             }
 
@@ -105,10 +107,14 @@ private GoogleMap mMap;
         });
     }
     private void setMarker(LatLng latLng) {
+        float[] distance = new float[1];
+        Location.distanceBetween(latLng.latitude,latLng.longitude,userlocation.getLatitude(),userlocation.getLongitude(),distance);
+
         if (markers.size() == POLYGON_SIDES)
             clearMap();
         MarkerOptions options = new MarkerOptions().position(latLng)
                 .title(strTitles[markers.size()])
+                .snippet("Distance - "+distance[0])
                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.locationn))
                 .draggable(true);
         markers.add(mMap.addMarker(options));
